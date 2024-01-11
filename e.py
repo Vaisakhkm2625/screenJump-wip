@@ -31,8 +31,8 @@ def find_buttons_and_boxes(image_path):
             aspect_ratio = w / float(h)
             area = cv2.contourArea(approx)
             if area > 10:
-                if 0.5 <= aspect_ratio <= 2.0:
-                    buttons_and_boxes.append((i + 1, approx, (x, y)))
+                #if 0.5 <= aspect_ratio <= 2.0:
+                buttons_and_boxes.append((i + 1, approx, (x, y)))
                 
     return buttons_and_boxes
 
@@ -56,7 +56,7 @@ def print_element_positions(elements):
         print(f"{label}\t{x}\t{y}")
 
 if __name__ == "__main__":
-    image_path = "./winsome.png"
+    image_path = "./out.png"
     output_path = "./hello.png"
     
     detected_elements = find_buttons_and_boxes(image_path)

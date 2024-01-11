@@ -1,15 +1,32 @@
 import cv2
 import numpy as np
 
+
+def adjust_contrast_brightness(img, contrast:float=1.0, brightness:int=0):
+    """
+    Adjusts contrast and brightness of an uint8 image.
+    contrast:   (0.0,  inf) with 1.0 leaving the contrast as is
+    brightness: [-255, 255] with 0 leaving the brightness as is
+    """
+    brightness += int(round(255*(1-contrast)/2))
+    return cv2.addWeighted(img, contrast, img, 0, brightness)
+
 def find_buttons(image_path):
     # Read the input image
     image = cv2.imread(image_path)
-    
+
+    im= adjust_contrast_brightness(image)
+
+
     # Convert the image to grayscale
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    
+
+
     # Apply adaptive thresholding to deal with variations in lighting
     _, thresh = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+    # fix this
+
+    #cv2.imwrite(output_path+"1.png", thresh)
     
     # Use Canny edge detector to find edges
     edges = cv2.Canny(thresh, 50, 150)
@@ -47,7 +64,7 @@ def save_image_with_buttons(image_path, output_path, buttons):
     cv2.imwrite(output_path, image)
 
 if __name__ == "__main__":
-    image_path = "./out.png"
+    image_path = "./winsome.png"
     output_path = "./hello.png"
     
     detected_buttons = find_buttons(image_path)
