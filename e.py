@@ -10,9 +10,13 @@ def find_buttons_and_boxes(image_path):
     
     # Apply adaptive thresholding to deal with variations in lighting
     _, thresh = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+
+    cv2.imwrite(output_path+"gray.png", gray)
     
     # Use Canny edge detector to find edges
-    edges = cv2.Canny(thresh, 50, 150)
+    #edges = cv2.Canny(thresh, 50, 150)
+    edges = cv2.Canny(gray, 100, 300)
+    cv2.imwrite(output_path+"edges.png", edges)
     
     # Find contours in the edged image
     contours, _ = cv2.findContours(edges.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
@@ -20,19 +24,29 @@ def find_buttons_and_boxes(image_path):
     buttons_and_boxes = []
 
     for i, cnt in enumerate(contours):
-        # Approximate the contour to a polygon
-        epsilon = 0.04 * cv2.arcLength(cnt, True)
-        approx = cv2.approxPolyDP(cnt, epsilon, True)
+        epsilon = 0.04 * cv2.arcLength(cnt, False)
+        print("e-",cv2.arcLength(cnt, False))
+        #approx = cv2.approxPolyDP(cnt, epsilon, True)
+        approx = cv2.convexHull(cnt, epsilon, True)
+        x, y, w, h = cv2.boundingRect(approx)
+        buttons_and_boxes.append((i + 1, approx, (x, y)))
 
-        # Check if the polygon has a specific number of vertices
-        if 4 <= len(approx) <= 8:
-            # Check if the aspect ratio of the bounding rectangle is within a certain range
-            x, y, w, h = cv2.boundingRect(approx)
-            aspect_ratio = w / float(h)
-            area = cv2.contourArea(approx)
-            if area > 10:
-                #if 0.5 <= aspect_ratio <= 2.0:
-                buttons_and_boxes.append((i + 1, approx, (x, y)))
+
+    #for i, cnt in enumerate(contours):
+    #    # Approximate the contour to a polygon
+    #    epsilon = 0.04 * cv2.arcLength(cnt, True)
+    #    approx = cv2.approxPolyDP(cnt, epsilon, True)
+    #    print(approx)
+
+    #    # Check if the polygon has a specific number of vertices
+    #    #if 4 <= len(approx) <= 8:
+    #    # Check if the aspect ratio of the bounding rectangle is within a certain range
+    #    x, y, w, h = cv2.boundingRect(approx)
+    #    aspect_ratio = w / float(h)
+    #    area = cv2.contourArea(approx)
+    #    if area > 10:
+    #        #if 0.5 <= aspect_ratio <= 2.0:
+    #        buttons_and_boxes.append((i + 1, approx, (x, y)))
                 
     return buttons_and_boxes
 
@@ -56,7 +70,7 @@ def print_element_positions(elements):
         print(f"{label}\t{x}\t{y}")
 
 if __name__ == "__main__":
-    image_path = "./out.png"
+    image_path = "./winsome.png"
     output_path = "./hello.png"
     
     detected_elements = find_buttons_and_boxes(image_path)

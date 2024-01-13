@@ -23,19 +23,23 @@ def find_buttons(image_path):
 
 
     # Apply adaptive thresholding to deal with variations in lighting
-    _, thresh = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+    #_, thresh = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
     # fix this
 
-    #cv2.imwrite(output_path+"1.png", thresh)
+    cv2.imwrite(output_path+"1.png", gray)
     
     # Use Canny edge detector to find edges
-    edges = cv2.Canny(thresh, 50, 150)
+    #edges = cv2.Canny(thresh, 50, 150)
+    edges = cv2.Canny(gray, 50, 150)
+
+    cv2.imwrite(output_path+"edge.png", edges)
     
     # Find contours in the edged image
     contours, _ = cv2.findContours(edges.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     
     buttons = []
 
+    print(len(contours))
     for cnt in contours:
         # Approximate the contour to a polygon
         epsilon = 0.04 * cv2.arcLength(cnt, True)
